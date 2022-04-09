@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/cartoes")
 public class CartaoController {
@@ -22,7 +24,7 @@ public class CartaoController {
         this.service = service;
     }
     @PostMapping
-    public ResponseEntity<?> criarCartao(@RequestBody Cartao cartao){
+    public ResponseEntity<?> criarCartao(@Valid @RequestBody Cartao cartao){
         try{
             return ResponseEntity.ok(service.create(cartao));
         }catch (CartaoExistenteException e){
