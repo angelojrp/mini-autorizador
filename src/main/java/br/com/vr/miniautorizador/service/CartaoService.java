@@ -7,20 +7,16 @@ import br.com.vr.miniautorizador.model.CartaoProjection;
 import br.com.vr.miniautorizador.model.Parametro;
 import br.com.vr.miniautorizador.repository.CartaoRepository;
 import br.com.vr.miniautorizador.repository.ParametroRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.repository.config.RepositoryConfigurationExtension;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
 public class CartaoService {
 
-    private CartaoRepository cartaoRepository;
-    private ParametroRepository parametroRepository;
+    private final CartaoRepository cartaoRepository;
+    private final ParametroRepository parametroRepository;
 
     public CartaoService(CartaoRepository cartaoRepository, ParametroRepository parametroRepository) {
         this.cartaoRepository = cartaoRepository;
@@ -50,6 +46,6 @@ public class CartaoService {
     }
 
     public BigDecimal obterSaldo(String numeroCartao) {
-        return cartaoRepository.findById(numeroCartao).orElseThrow(() -> new CartaoInexistenteException()).getSaldo();
+        return cartaoRepository.findById(numeroCartao).orElseThrow(CartaoInexistenteException::new).getSaldo();
     }
 }
