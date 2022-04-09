@@ -1,6 +1,7 @@
 package br.com.vr.miniautorizador.service;
 
 import br.com.vr.miniautorizador.exception.CartaoExistenteException;
+import br.com.vr.miniautorizador.exception.CartaoInexistenteException;
 import br.com.vr.miniautorizador.model.Cartao;
 import br.com.vr.miniautorizador.model.CartaoProjection;
 import br.com.vr.miniautorizador.model.Parametro;
@@ -46,5 +47,9 @@ public class CartaoService {
 
         cartao.setSaldo(new BigDecimal(saldoInicial.getValor()));
         return cartao;
+    }
+
+    public BigDecimal obterSaldo(String numeroCartao) {
+        return cartaoRepository.findById(numeroCartao).orElseThrow(() -> new CartaoInexistenteException()).getSaldo();
     }
 }

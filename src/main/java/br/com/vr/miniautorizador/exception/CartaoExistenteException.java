@@ -1,4 +1,6 @@
 package br.com.vr.miniautorizador.exception;
 
-public class CartaoExistenteException extends NegocioException{
+import br.com.vr.miniautorizador.enums.TipoRetornoErroEnum;
+
+public class CartaoExistenteException extends NegocioException {
 }
