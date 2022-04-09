@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      host: localhost
+      password: password
+      username: user
+      port: 27017
+      database: miniautorizador
+
+vr:
+  autorizador:
+    cartao:
+      saldo-inicial: 500
