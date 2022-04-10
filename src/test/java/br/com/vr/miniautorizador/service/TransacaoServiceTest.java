@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -127,6 +128,20 @@ public class TransacaoServiceTest {
 
             verify(transacaoRepository, times(0)).insert(any(Transacao.class));
             verify(cartaoRepository, times(0)).save(any(Cartao.class));
+        }
+
+        @Test
+        public void deveriaLancarExcecao_quandoMuitasTransacoesESaldoInsuficiente() {
+            Transacao transacaoSaldoInv = Transacao.builder().numeroCartao(NUM_CARTAO)
+                    .valor(new BigDecimal(VAL_TRANSACAO))
+                    .senha(SENHA).build();
+
+            Assertions.assertThrows(SaldoInsuficienteException.class, () ->
+                    IntStream.range(1, 5).forEach(i -> service.realizarTransacao(transacaoSaldoInv))
+            );
+
+            verify(transacaoRepository, times(2)).insert(any(Transacao.class));
+            verify(cartaoRepository, times(2)).save(any(Cartao.class));
         }
     }
 
