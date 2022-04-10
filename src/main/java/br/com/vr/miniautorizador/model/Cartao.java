@@ -1,14 +1,21 @@
 package br.com.vr.miniautorizador.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -30,4 +37,15 @@ public class Cartao implements Serializable {
 
     @Version
     private Long version;
+
+    @JsonIgnore
+    @DBRef
+    @Builder.Default
+    private List<Transacao> transacoes = new ArrayList<>();
+
+    @CreatedDate
+    private Instant dataCadastro;
+
+    @LastModifiedDate
+    private Instant dataAtualizacao;
 }
