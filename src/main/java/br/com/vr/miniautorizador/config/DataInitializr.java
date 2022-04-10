@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class DataInitializr implements ApplicationListener<ContextRefreshedEvent> {
 
-    private ParametroRepository parametroRepository;
+    private final ParametroRepository parametroRepository;
 
     @Value("${vr.autorizador.cartao.saldo-inicial}")
     private String saldoInicial;
@@ -24,10 +24,8 @@ public class DataInitializr implements ApplicationListener<ContextRefreshedEvent
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         parametroRepository.findById("saldoInicial").ifPresentOrElse(
-                v -> {
-                    log.debug("Parametro [saldoInicial] já existe no repositório");
-                },
-                () -> criarParametroSaldoInicial());
+                v -> log.debug("Parametro [saldoInicial] já existe no repositório"),
+                this::criarParametroSaldoInicial);
     }
 
     private void criarParametroSaldoInicial() {
