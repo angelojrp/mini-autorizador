@@ -1,7 +1,6 @@
 package br.com.vr.miniautorizador.handler;
 
 import br.com.vr.miniautorizador.exception.NegocioException;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
