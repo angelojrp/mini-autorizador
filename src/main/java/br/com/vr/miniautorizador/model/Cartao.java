@@ -36,7 +36,7 @@ public class Cartao implements Serializable {
     private BigDecimal saldo;
 
     @Version
-    private Long version;
+    private Long version; //lock otimista
 
     @JsonIgnore
     @DBRef
