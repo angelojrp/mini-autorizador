@@ -23,7 +23,6 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 
@@ -42,13 +41,10 @@ public class CartaoServiceTest {
 
     private Cartao cartao;
     private CriarCartaoRequestDTO requestDTO;
-    private CriarCartaoResponseDTO responseDTO;
 
     @BeforeEach
     public void init() {
         service = new CartaoService(cartaoRepository, parametroRepository);
-
-        responseDTO = CriarCartaoResponseDTO.builder().numeroCartao(NUM_CARTAO).senha(SENHA).build();
 
         cartao = Cartao.builder() //
                 .numeroCartao(NUM_CARTAO) //
@@ -75,8 +71,6 @@ public class CartaoServiceTest {
         @Test
         public void deveriaCriarCartao_quandoDadosValidos() {
             when(cartaoRepository.findById(Mockito.any())).thenReturn(Optional.empty());
-            when(cartaoRepository.findProjectedByNumeroCartao(Mockito.any(), eq(CriarCartaoResponseDTO.class)))
-                    .thenReturn(Optional.of(responseDTO));
 
             CriarCartaoResponseDTO cartaoRetorno = Assertions.assertDoesNotThrow(() -> service.create(requestDTO).orElseThrow());
 
@@ -89,7 +83,6 @@ public class CartaoServiceTest {
 
             verify(cartaoRepository, times(1)).insert(Mockito.any(Cartao.class));
             verify(cartaoRepository, times(1)).findById(Mockito.any());
-            verify(cartaoRepository, times(1)).findProjectedByNumeroCartao(Mockito.any(), eq(CriarCartaoResponseDTO.class));
         }
 
         @Test
@@ -120,7 +113,7 @@ public class CartaoServiceTest {
         public void deveriaTerSaldoInicial_quandoCartaoRecemCriado() {
             final Cartao cartao = Cartao.builder().numeroCartao(NUM_CARTAO)
                     .senha(SENHA)
-                    .saldo( new BigDecimal(VAL_SALDO_INICIAL)).build();
+                    .saldo(new BigDecimal(VAL_SALDO_INICIAL)).build();
             when(cartaoRepository.findById(Mockito.any()))
                     .thenReturn(Optional.of(cartao));
 

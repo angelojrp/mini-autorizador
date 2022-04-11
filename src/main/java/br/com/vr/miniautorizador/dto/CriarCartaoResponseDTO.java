@@ -1,6 +1,7 @@
 package br.com.vr.miniautorizador.dto;
 
 import lombok.*;
+import org.mapstruct.Mapping;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
