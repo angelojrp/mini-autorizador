@@ -36,7 +36,7 @@ public class CartaoService {
                     cartaoRepository.insert(novoCartao);
                 }
         );
-        return cartaoRepository.findProjectedByNumeroCartao(cartao.getNumeroCartao(), CriarCartaoResponseDTO.class);
+        return Optional.of(CartaoMapper.INSTANCE.entityToCriarCartaoResponseDTO(cartao));
     }
 
     private Cartao configurarNovoCartao(Cartao cartao) {
