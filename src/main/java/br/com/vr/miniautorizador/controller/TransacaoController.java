@@ -1,8 +1,7 @@
 package br.com.vr.miniautorizador.controller;
 
+import br.com.vr.miniautorizador.dto.RealizarTransacaoRequestDTO;
 import br.com.vr.miniautorizador.enums.TipoRetornoErroEnum;
-import br.com.vr.miniautorizador.model.CartaoProjection;
-import br.com.vr.miniautorizador.model.Transacao;
 import br.com.vr.miniautorizador.service.TransacaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,8 +38,8 @@ public class TransacaoController {
     }
     )
     @PostMapping
-    public ResponseEntity<?> realizarTransacao(@Valid @RequestBody Transacao transacao) {
-        service.realizarTransacao(transacao);
+    public ResponseEntity<?> realizarTransacao(@Valid @RequestBody RealizarTransacaoRequestDTO dto) {
+        service.realizarTransacao(dto);
         return ResponseEntity.ok().build();
     }
 

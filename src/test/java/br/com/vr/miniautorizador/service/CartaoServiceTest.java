@@ -1,9 +1,10 @@
 package br.com.vr.miniautorizador.service;
 
+import br.com.vr.miniautorizador.dto.CriarCartaoRequestDTO;
+import br.com.vr.miniautorizador.dto.CriarCartaoResponseDTO;
 import br.com.vr.miniautorizador.exception.CartaoExistenteException;
 import br.com.vr.miniautorizador.exception.CartaoInexistenteException;
 import br.com.vr.miniautorizador.model.Cartao;
-import br.com.vr.miniautorizador.model.CartaoProjection;
 import br.com.vr.miniautorizador.model.Parametro;
 import br.com.vr.miniautorizador.repository.CartaoRepository;
 import br.com.vr.miniautorizador.repository.ParametroRepository;
@@ -29,6 +30,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class CartaoServiceTest {
     public static final String VAL_SALDO_INICIAL = "500";
+    public static final String NUM_CARTAO = "1234123412341234";
+    public static final String SENHA = "1234567";
+
     @Mock
     private CartaoRepository cartaoRepository;
 
@@ -37,28 +41,22 @@ public class CartaoServiceTest {
     private CartaoService service;
 
     private Cartao cartao;
-    private CartaoProjection cartaoProjecao;
+    private CriarCartaoRequestDTO requestDTO;
+    private CriarCartaoResponseDTO responseDTO;
 
     @BeforeEach
     public void init() {
         service = new CartaoService(cartaoRepository, parametroRepository);
 
-        cartaoProjecao = new CartaoProjection() {
-            @Override
-            public String getNumeroCartao() {
-                return "6549873025634501";
-            }
-
-            @Override
-            public String getSenha() {
-                return "123456";
-            }
-        };
+        responseDTO = CriarCartaoResponseDTO.builder().numeroCartao(NUM_CARTAO).senha(SENHA).build();
 
         cartao = Cartao.builder() //
-                .numeroCartao("6549873025634501") //
-                .senha("123456") //
+                .numeroCartao(NUM_CARTAO) //
+                .senha(SENHA) //
                 .build();
+        requestDTO = CriarCartaoRequestDTO.builder()
+                .numeroCartao(NUM_CARTAO)
+                .senha(SENHA).build();
     }
 
     @Nested
@@ -77,28 +75,28 @@ public class CartaoServiceTest {
         @Test
         public void deveriaCriarCartao_quandoDadosValidos() {
             when(cartaoRepository.findById(Mockito.any())).thenReturn(Optional.empty());
-            when(cartaoRepository.findProjectedByNumeroCartao(Mockito.any(), eq(CartaoProjection.class)))
-                    .thenReturn(Optional.of(cartaoProjecao));
+            when(cartaoRepository.findProjectedByNumeroCartao(Mockito.any(), eq(CriarCartaoResponseDTO.class)))
+                    .thenReturn(Optional.of(responseDTO));
 
-            CartaoProjection cartaoRetorno = Assertions.assertDoesNotThrow(() -> service.create(cartao).orElseThrow());
+            CriarCartaoResponseDTO cartaoRetorno = Assertions.assertDoesNotThrow(() -> service.create(requestDTO).orElseThrow());
 
             assertThat(cartaoRetorno,
                     allOf(
-                            hasProperty("numeroCartao", equalTo("6549873025634501")),
-                            hasProperty("senha", equalTo("123456"))
+                            hasProperty("numeroCartao", equalTo(NUM_CARTAO)),
+                            hasProperty("senha", equalTo(SENHA))
                     )
             );
 
             verify(cartaoRepository, times(1)).insert(Mockito.any(Cartao.class));
             verify(cartaoRepository, times(1)).findById(Mockito.any());
-            verify(cartaoRepository, times(1)).findProjectedByNumeroCartao(Mockito.any(), eq(CartaoProjection.class));
+            verify(cartaoRepository, times(1)).findProjectedByNumeroCartao(Mockito.any(), eq(CriarCartaoResponseDTO.class));
         }
 
         @Test
         public void deveriaLancarExcecao_quandoCartaoExistente() {
             when(cartaoRepository.findById(any())).thenReturn(Optional.of(cartao));
 
-            Assertions.assertThrows(CartaoExistenteException.class, () -> service.create(cartao));
+            Assertions.assertThrows(CartaoExistenteException.class, () -> service.create(requestDTO));
 
             verify(cartaoRepository, times(0)).insert(Mockito.any(Cartao.class));
             verify(cartaoRepository, times(1)).findById(Mockito.any());
@@ -106,7 +104,7 @@ public class CartaoServiceTest {
     }
 
     @Nested
-    class ConsultarSaldoTest{
+    class ConsultarSaldoTest {
 
         @BeforeEach
         public void init() {
@@ -119,28 +117,23 @@ public class CartaoServiceTest {
         }
 
         @Test
-        public void deveriaTerSaldoInicial_quandoCartaoRecemCriado(){
+        public void deveriaTerSaldoInicial_quandoCartaoRecemCriado() {
+            final Cartao cartao = Cartao.builder().numeroCartao(NUM_CARTAO)
+                    .senha(SENHA)
+                    .saldo( new BigDecimal(VAL_SALDO_INICIAL)).build();
             when(cartaoRepository.findById(Mockito.any()))
-                    .thenReturn(Optional.empty())
                     .thenReturn(Optional.of(cartao));
-
-            when(cartaoRepository.findProjectedByNumeroCartao(Mockito.any(), eq(CartaoProjection.class)))
-                    .thenReturn(Optional.of(cartaoProjecao));
-
-            Assertions.assertDoesNotThrow(() -> service.create(cartao).orElseThrow());
 
             BigDecimal saldo = Assertions.assertDoesNotThrow(() -> service.obterSaldo(cartao.getNumeroCartao()));
 
             BigDecimal saldoEsperado = new BigDecimal(VAL_SALDO_INICIAL);
             assertThat(saldo, equalTo(saldoEsperado));
 
-            verify(cartaoRepository, times(1)).insert(Mockito.any(Cartao.class));
-            verify(cartaoRepository, times(2)).findById(Mockito.any());
-            verify(cartaoRepository, times(1)).findProjectedByNumeroCartao(Mockito.any(), Mockito.any());
+            verify(cartaoRepository, times(1)).findById(Mockito.any());
         }
 
         @Test
-        public void deveriaLancarExcecao_quandoCartaoNaoExiste(){
+        public void deveriaLancarExcecao_quandoCartaoNaoExiste() {
             when(cartaoRepository.findById(Mockito.any()))
                     .thenReturn(Optional.empty());
 

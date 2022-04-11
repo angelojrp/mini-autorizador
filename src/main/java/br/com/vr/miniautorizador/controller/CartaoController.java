@@ -1,8 +1,8 @@
 package br.com.vr.miniautorizador.controller;
 
+import br.com.vr.miniautorizador.dto.CriarCartaoRequestDTO;
+import br.com.vr.miniautorizador.dto.CriarCartaoResponseDTO;
 import br.com.vr.miniautorizador.exception.CartaoExistenteException;
-import br.com.vr.miniautorizador.model.Cartao;
-import br.com.vr.miniautorizador.model.CartaoProjection;
 import br.com.vr.miniautorizador.service.CartaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,19 +31,19 @@ public class CartaoController {
     @Operation(summary = "Adiciona um novo cartão")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Caso o cartão seja inserido com sucesso",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = CartaoProjection.class)),
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = CriarCartaoResponseDTO.class)),
                     }),
             @ApiResponse(responseCode = "422", description = "Caso o cartão já esteja cadastrado",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = CartaoProjection.class)),
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = CriarCartaoResponseDTO.class)),
                     })
     }
     )
     @PostMapping
-    public ResponseEntity<?> criarCartao(@Valid @RequestBody Cartao cartao) {
+    public ResponseEntity<?> criarCartao(@Valid @RequestBody CriarCartaoRequestDTO dto) {
         try {
-            return ResponseEntity.ok(service.create(cartao));
+            return ResponseEntity.ok(service.create(dto));
         } catch (CartaoExistenteException e) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(cartao);
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(dto);
         }
     }
 

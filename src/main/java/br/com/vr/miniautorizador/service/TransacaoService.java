@@ -1,5 +1,7 @@
 package br.com.vr.miniautorizador.service;
 
+import br.com.vr.miniautorizador.dto.RealizarTransacaoRequestDTO;
+import br.com.vr.miniautorizador.mapper.TransacaoMapper;
 import br.com.vr.miniautorizador.model.Cartao;
 import br.com.vr.miniautorizador.model.Transacao;
 import br.com.vr.miniautorizador.repository.CartaoRepository;
@@ -27,7 +29,8 @@ public class TransacaoService {
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Transacao realizarTransacao(Transacao transacao) {
+    public void realizarTransacao(RealizarTransacaoRequestDTO dto) {
+        final Transacao transacao = TransacaoMapper.INSTANCE.realizarTransacaoRequestDTOToEntity(dto);
         Optional<Cartao> optCartao = cartaoRepository.findById(transacao.getNumeroCartao());
         accept(optCartao, transacao);
         optCartao.ifPresent((cartao -> {
@@ -35,7 +38,6 @@ public class TransacaoService {
             Transacao transacaoPersistida = salvarTransacao(transacao, cartao);
             salvarCartao(transacaoPersistida, cartao);
         }));
-        return transacao;
     }
 
     private Transacao salvarTransacao(Transacao transacao, Cartao cartao){

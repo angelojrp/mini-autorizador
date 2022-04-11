@@ -1,9 +1,11 @@
 package br.com.vr.miniautorizador.service;
 
+import br.com.vr.miniautorizador.dto.CriarCartaoRequestDTO;
+import br.com.vr.miniautorizador.dto.CriarCartaoResponseDTO;
 import br.com.vr.miniautorizador.exception.CartaoExistenteException;
 import br.com.vr.miniautorizador.exception.CartaoInexistenteException;
+import br.com.vr.miniautorizador.mapper.CartaoMapper;
 import br.com.vr.miniautorizador.model.Cartao;
-import br.com.vr.miniautorizador.model.CartaoProjection;
 import br.com.vr.miniautorizador.model.Parametro;
 import br.com.vr.miniautorizador.repository.CartaoRepository;
 import br.com.vr.miniautorizador.repository.ParametroRepository;
@@ -23,7 +25,8 @@ public class CartaoService {
         this.parametroRepository = parametroRepository;
     }
 
-    public Optional<CartaoProjection> create(Cartao cartao) {
+    public Optional<CriarCartaoResponseDTO> create(CriarCartaoRequestDTO dto) {
+        final Cartao cartao = CartaoMapper.INSTANCE.criarCartaoRequestDTOToEntity(dto);
         cartaoRepository.findById(cartao.getNumeroCartao()).ifPresentOrElse(
                 (c) -> {
                     throw new CartaoExistenteException();
@@ -33,7 +36,7 @@ public class CartaoService {
                     cartaoRepository.insert(novoCartao);
                 }
         );
-        return cartaoRepository.findProjectedByNumeroCartao(cartao.getNumeroCartao(), CartaoProjection.class);
+        return cartaoRepository.findProjectedByNumeroCartao(cartao.getNumeroCartao(), CriarCartaoResponseDTO.class);
     }
 
     private Cartao configurarNovoCartao(Cartao cartao) {
